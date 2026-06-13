@@ -22,6 +22,7 @@ class InventoryStock(Base):
     __tablename__ = "inventory_stock"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    shop_id: Mapped[int] = mapped_column(ForeignKey("shops.id"), nullable=False, index=True)
     product_id: Mapped[int] = mapped_column(ForeignKey("products.id"), unique=True, nullable=False)
     current_stock: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     low_stock_threshold: Mapped[int] = mapped_column(Integer, default=5, nullable=False)
@@ -34,6 +35,7 @@ class StockMovement(Base):
     __tablename__ = "stock_movements"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    shop_id: Mapped[int] = mapped_column(ForeignKey("shops.id"), nullable=False, index=True)
     product_id: Mapped[int] = mapped_column(ForeignKey("products.id"), nullable=False)
     movement_type: Mapped[MovementType] = mapped_column(SqlEnum(MovementType), nullable=False)
     quantity: Mapped[int] = mapped_column(Integer, nullable=False)

@@ -7,7 +7,7 @@ import { AuthContext } from "../auth/context";
 export function LoginPage() {
   const { login } = useContext(AuthContext);
   const [mode, setMode] = useState("login");
-  const [form, setForm] = useState({ full_name: "", email: "", password: "", role: "owner" });
+  const [form, setForm] = useState({ business_name: "", full_name: "", email: "", password: "", role: "owner" });
   const [error, setError] = useState("");
 
   async function submit(event) {
@@ -33,7 +33,10 @@ export function LoginPage() {
         </div>
         <form onSubmit={submit}>
           {mode === "register" && (
-            <label>Full name<input value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} required /></label>
+            <>
+              <label>Business name<input value={form.business_name} onChange={(e) => setForm({ ...form, business_name: e.target.value })} required /></label>
+              <label>Owner name<input value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} required /></label>
+            </>
           )}
           <label>Email<input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required /></label>
           <label>Password<input type="password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required minLength={8} /></label>
@@ -47,4 +50,3 @@ export function LoginPage() {
     </div>
   );
 }
-

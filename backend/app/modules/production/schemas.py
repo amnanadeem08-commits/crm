@@ -15,6 +15,7 @@ class RawMaterialCreate(BaseModel):
 
 class RawMaterialRead(RawMaterialCreate):
     id: int
+    shop_id: int
 
     model_config = {"from_attributes": True}
 
@@ -30,6 +31,7 @@ class ProductionBatchCreate(BaseModel):
 
 class ProductionBatchRead(BaseModel):
     id: int
+    shop_id: int
     batch_date: date
     finished_product_id: int
     quantity_produced: int
@@ -39,4 +41,3 @@ class ProductionBatchRead(BaseModel):
     finished_product: ProductRead
 
     model_config = {"from_attributes": True}
-

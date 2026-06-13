@@ -14,6 +14,7 @@ class StockUpsert(BaseModel):
 
 class StockRead(BaseModel):
     id: int
+    shop_id: int
     product_id: int
     current_stock: int
     low_stock_threshold: int
@@ -31,6 +32,7 @@ class MovementCreate(BaseModel):
 
 class MovementRead(BaseModel):
     id: int
+    shop_id: int
     product_id: int
     movement_type: MovementType
     quantity: int
@@ -39,4 +41,3 @@ class MovementRead(BaseModel):
     product: ProductRead
 
     model_config = {"from_attributes": True}
-

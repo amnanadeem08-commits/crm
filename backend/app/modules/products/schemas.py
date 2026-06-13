@@ -10,6 +10,7 @@ class CategoryCreate(BaseModel):
 
 class CategoryRead(CategoryCreate):
     id: int
+    shop_id: int
 
     model_config = {"from_attributes": True}
 
@@ -44,7 +45,7 @@ class ProductUpdate(BaseModel):
 
 class ProductRead(ProductBase):
     id: int
+    shop_id: int
     category: CategoryRead | None = None
 
     model_config = {"from_attributes": True}
-

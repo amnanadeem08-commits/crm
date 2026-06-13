@@ -17,11 +17,10 @@ def create_sale(payload: SaleCreate, db: Session = Depends(get_db), current_user
 
 
 @router.get("", response_model=list[SaleRead])
-def list_sales(customer_name: str | None = Query(default=None), db: Session = Depends(get_db), _: User = Depends(require_manager)):
-    return SalesService(db).list(customer_name)
+def list_sales(customer_name: str | None = Query(default=None), db: Session = Depends(get_db), current_user: User = Depends(require_manager)):
+    return SalesService(db).list(current_user, customer_name)
 
 
 @router.get("/reports/{period}", response_model=SalesReport)
-def sales_report(period: str, db: Session = Depends(get_db), _: User = Depends(require_manager)):
-    return SalesService(db).report(period)
-
+def sales_report(period: str, db: Session = Depends(get_db), current_user: User = Depends(require_manager)):
+    return SalesService(db).report(period, current_user)

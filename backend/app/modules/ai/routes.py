@@ -18,39 +18,39 @@ router = APIRouter()
 
 
 @router.get("/inventory-insight", response_model=BusinessInsight)
-def inventory_insight(db: Session = Depends(get_db), _: User = Depends(require_manager)):
-    stock_rows = InventoryService(db).list_stock()
+def inventory_insight(db: Session = Depends(get_db), current_user: User = Depends(require_manager)):
+    stock_rows = InventoryService(db).list_stock(current_user)
     return AiInsightService().inventory_insight(stock_rows)
 
 
 @router.get("/business-health", response_model=BusinessHealth)
-def business_health(db: Session = Depends(get_db), _: User = Depends(require_manager)):
+def business_health(db: Session = Depends(get_db), current_user: User = Depends(require_manager)):
     inventory = InventoryService(db)
     return AiInsightService().full_business_health(
-        inventory.list_stock(),
-        inventory.list_movements(),
-        SalesService(db).list(),
-        AttendanceService(db).list(),
-        PayrollService(db).list(),
-        FinanceService(db).profit_loss(),
-        ProductionService(db).list_batches(),
+        inventory.list_stock(current_user),
+        inventory.list_movements(current_user),
+        SalesService(db).list(current_user),
+        AttendanceService(db).list(current_user),
+        PayrollService(db).list(current_user),
+        FinanceService(db).profit_loss(current_user),
+        ProductionService(db).list_batches(current_user),
     )
 
 
 @router.get("/exceptions", response_model=list[BusinessException])
-def exceptions(db: Session = Depends(get_db), _: User = Depends(require_manager)):
+def exceptions(db: Session = Depends(get_db), current_user: User = Depends(require_manager)):
     inventory = InventoryService(db)
-    return AiInsightService().detect_exceptions(inventory.list_stock(), inventory.list_movements())
+    return AiInsightService().detect_exceptions(inventory.list_stock(current_user), inventory.list_movements(current_user))
 
 
 @router.get("/daily-brief", response_model=DailyBrief)
-def daily_brief(db: Session = Depends(get_db), _: User = Depends(require_manager)):
+def daily_brief(db: Session = Depends(get_db), current_user: User = Depends(require_manager)):
     inventory = InventoryService(db)
     return AiInsightService().full_daily_brief(
-        inventory.list_stock(),
-        inventory.list_movements(),
-        SalesService(db).list(),
-        AttendanceService(db).list(),
-        FinanceService(db).profit_loss(),
-        ProductionService(db).list_batches(),
+        inventory.list_stock(current_user),
+        inventory.list_movements(current_user),
+        SalesService(db).list(current_user),
+        AttendanceService(db).list(current_user),
+        FinanceService(db).profit_loss(current_user),
+        ProductionService(db).list_batches(current_user),
     )

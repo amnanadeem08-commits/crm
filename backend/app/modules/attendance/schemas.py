@@ -16,7 +16,7 @@ class AttendanceCreate(BaseModel):
 
 class AttendanceRead(AttendanceCreate):
     id: int
+    shop_id: int
     employee: EmployeeRead
 
     model_config = {"from_attributes": True}
-

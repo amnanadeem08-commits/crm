@@ -20,6 +20,7 @@ class SaleCreate(BaseModel):
 
 class SaleItemRead(BaseModel):
     id: int
+    shop_id: int
     product_id: int
     quantity: int
     unit_price: Decimal
@@ -32,6 +33,7 @@ class SaleItemRead(BaseModel):
 
 class SaleRead(BaseModel):
     id: int
+    shop_id: int
     customer_name: str
     total_revenue: Decimal
     total_cost: Decimal
@@ -47,4 +49,3 @@ class SalesReport(BaseModel):
     total_revenue: Decimal
     total_cost: Decimal
     gross_profit: Decimal
-

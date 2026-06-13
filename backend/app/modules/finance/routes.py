@@ -12,16 +12,15 @@ router = APIRouter()
 
 
 @router.post("/expenses", response_model=ExpenseRead, status_code=201)
-def create_expense(payload: ExpenseCreate, db: Session = Depends(get_db), _: User = Depends(require_manager)):
-    return FinanceService(db).create_expense(payload)
+def create_expense(payload: ExpenseCreate, db: Session = Depends(get_db), current_user: User = Depends(require_manager)):
+    return FinanceService(db).create_expense(payload, current_user)
 
 
 @router.get("/expenses", response_model=list[ExpenseRead])
-def list_expenses(db: Session = Depends(get_db), _: User = Depends(require_manager)):
-    return FinanceService(db).list_expenses()
+def list_expenses(db: Session = Depends(get_db), current_user: User = Depends(require_manager)):
+    return FinanceService(db).list_expenses(current_user)
 
 
 @router.get("/profit-loss", response_model=ProfitLossSummary)
-def profit_loss(db: Session = Depends(get_db), _: User = Depends(require_manager)):
-    return FinanceService(db).profit_loss()
-
+def profit_loss(db: Session = Depends(get_db), current_user: User = Depends(require_manager)):
+    return FinanceService(db).profit_loss(current_user)

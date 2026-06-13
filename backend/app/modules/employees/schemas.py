@@ -21,6 +21,6 @@ class EmployeeUpdate(BaseModel):
 
 class EmployeeRead(EmployeeCreate):
     id: int
+    shop_id: int
 
     model_config = {"from_attributes": True}
-

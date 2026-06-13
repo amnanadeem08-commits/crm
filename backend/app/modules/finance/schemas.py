@@ -13,6 +13,7 @@ class ExpenseCreate(BaseModel):
 
 class ExpenseRead(ExpenseCreate):
     id: int
+    shop_id: int
 
     model_config = {"from_attributes": True}
 
@@ -24,4 +25,3 @@ class ProfitLossSummary(BaseModel):
     expenses: Decimal
     net_profit: Decimal
     status: str
-

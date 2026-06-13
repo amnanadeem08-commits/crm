@@ -13,6 +13,7 @@ class Sale(Base):
     __tablename__ = "sales"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    shop_id: Mapped[int] = mapped_column(ForeignKey("shops.id"), nullable=False, index=True)
     customer_name: Mapped[str] = mapped_column(String(120), default="Walk-in Customer", nullable=False, index=True)
     total_revenue: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
     total_cost: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
@@ -25,6 +26,7 @@ class SaleItem(Base):
     __tablename__ = "sale_items"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    shop_id: Mapped[int] = mapped_column(ForeignKey("shops.id"), nullable=False, index=True)
     sale_id: Mapped[int] = mapped_column(ForeignKey("sales.id"), nullable=False)
     product_id: Mapped[int] = mapped_column(ForeignKey("products.id"), nullable=False)
     quantity: Mapped[int] = mapped_column(nullable=False)
@@ -34,4 +36,3 @@ class SaleItem(Base):
 
     sale: Mapped[Sale] = relationship(back_populates="items")
     product: Mapped[Product] = relationship()
-

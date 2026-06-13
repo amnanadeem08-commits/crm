@@ -12,6 +12,7 @@ class RawMaterial(Base):
     __tablename__ = "raw_materials"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    shop_id: Mapped[int] = mapped_column(ForeignKey("shops.id"), nullable=False, index=True)
     name: Mapped[str] = mapped_column(String(120), nullable=False, index=True)
     unit: Mapped[str] = mapped_column(String(40), nullable=False)
     current_stock: Mapped[Decimal] = mapped_column(Numeric(12, 2), default=0, nullable=False)
@@ -22,6 +23,7 @@ class ProductionBatch(Base):
     __tablename__ = "production_batches"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    shop_id: Mapped[int] = mapped_column(ForeignKey("shops.id"), nullable=False, index=True)
     batch_date: Mapped[date] = mapped_column(Date, nullable=False, index=True)
     finished_product_id: Mapped[int] = mapped_column(ForeignKey("products.id"), nullable=False)
     quantity_produced: Mapped[int] = mapped_column(nullable=False)
@@ -31,4 +33,3 @@ class ProductionBatch(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
 
     finished_product: Mapped[Product] = relationship()
-

@@ -12,10 +12,10 @@ router = APIRouter()
 
 
 @router.post("", response_model=PayrollRead, status_code=201)
-def create_payroll(payload: PayrollCreate, db: Session = Depends(get_db), _: User = Depends(require_manager)):
-    return PayrollService(db).create(payload)
+def create_payroll(payload: PayrollCreate, db: Session = Depends(get_db), current_user: User = Depends(require_manager)):
+    return PayrollService(db).create(payload, current_user)
 
 
 @router.get("", response_model=list[PayrollRead])
-def list_payroll(db: Session = Depends(get_db), _: User = Depends(require_manager)):
-    return PayrollService(db).list()
+def list_payroll(db: Session = Depends(get_db), current_user: User = Depends(require_manager)):
+    return PayrollService(db).list(current_user)

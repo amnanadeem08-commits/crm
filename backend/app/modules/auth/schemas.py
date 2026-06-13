@@ -4,6 +4,7 @@ from app.modules.auth.models import UserRole
 
 
 class UserCreate(BaseModel):
+    business_name: str = Field(min_length=2, max_length=160)
     full_name: str = Field(min_length=2, max_length=120)
     email: EmailStr
     password: str = Field(min_length=8, max_length=72)
@@ -20,6 +21,7 @@ class UserRead(BaseModel):
     full_name: str
     email: EmailStr
     role: UserRole
+    shop_id: int
     is_active: bool
 
     model_config = {"from_attributes": True}
@@ -29,4 +31,3 @@ class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: UserRead
-

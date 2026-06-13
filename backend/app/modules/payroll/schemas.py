@@ -16,6 +16,7 @@ class PayrollCreate(BaseModel):
 
 class PayrollRead(BaseModel):
     id: int
+    shop_id: int
     employee_id: int
     payroll_month: int
     payroll_year: int
@@ -27,4 +28,3 @@ class PayrollRead(BaseModel):
     employee: EmployeeRead
 
     model_config = {"from_attributes": True}
-

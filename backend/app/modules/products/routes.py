@@ -12,36 +12,35 @@ router = APIRouter()
 
 
 @router.post("/categories", response_model=CategoryRead, status_code=201)
-def create_category(payload: CategoryCreate, db: Session = Depends(get_db), _: User = Depends(require_manager)):
-    return ProductService(db).create_category(payload)
+def create_category(payload: CategoryCreate, db: Session = Depends(get_db), current_user: User = Depends(require_manager)):
+    return ProductService(db).create_category(payload, current_user)
 
 
 @router.get("/categories", response_model=list[CategoryRead])
-def list_categories(db: Session = Depends(get_db), _: User = Depends(require_manager)):
-    return ProductService(db).list_categories()
+def list_categories(db: Session = Depends(get_db), current_user: User = Depends(require_manager)):
+    return ProductService(db).list_categories(current_user)
 
 
 @router.post("", response_model=ProductRead, status_code=201)
-def create_product(payload: ProductCreate, db: Session = Depends(get_db), _: User = Depends(require_manager)):
-    return ProductService(db).create_product(payload)
+def create_product(payload: ProductCreate, db: Session = Depends(get_db), current_user: User = Depends(require_manager)):
+    return ProductService(db).create_product(payload, current_user)
 
 
 @router.get("", response_model=list[ProductRead])
-def list_products(active_only: bool = False, db: Session = Depends(get_db), _: User = Depends(require_manager)):
-    return ProductService(db).list_products(active_only=active_only)
+def list_products(active_only: bool = False, db: Session = Depends(get_db), current_user: User = Depends(require_manager)):
+    return ProductService(db).list_products(current_user, active_only=active_only)
 
 
 @router.get("/{product_id}", response_model=ProductRead)
-def get_product(product_id: int, db: Session = Depends(get_db), _: User = Depends(require_manager)):
-    return ProductService(db).get_product(product_id)
+def get_product(product_id: int, db: Session = Depends(get_db), current_user: User = Depends(require_manager)):
+    return ProductService(db).get_product(product_id, current_user)
 
 
 @router.put("/{product_id}", response_model=ProductRead)
-def update_product(product_id: int, payload: ProductUpdate, db: Session = Depends(get_db), _: User = Depends(require_manager)):
-    return ProductService(db).update_product(product_id, payload)
+def update_product(product_id: int, payload: ProductUpdate, db: Session = Depends(get_db), current_user: User = Depends(require_manager)):
+    return ProductService(db).update_product(product_id, payload, current_user)
 
 
 @router.delete("/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_product(product_id: int, db: Session = Depends(get_db), _: User = Depends(require_manager)):
-    ProductService(db).delete_product(product_id)
-
+def delete_product(product_id: int, db: Session = Depends(get_db), current_user: User = Depends(require_manager)):
+    ProductService(db).delete_product(product_id, current_user)

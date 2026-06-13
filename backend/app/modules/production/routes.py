@@ -12,13 +12,13 @@ router = APIRouter()
 
 
 @router.post("/raw-materials", response_model=RawMaterialRead, status_code=201)
-def create_material(payload: RawMaterialCreate, db: Session = Depends(get_db), _: User = Depends(require_manager)):
-    return ProductionService(db).create_material(payload)
+def create_material(payload: RawMaterialCreate, db: Session = Depends(get_db), current_user: User = Depends(require_manager)):
+    return ProductionService(db).create_material(payload, current_user)
 
 
 @router.get("/raw-materials", response_model=list[RawMaterialRead])
-def list_materials(db: Session = Depends(get_db), _: User = Depends(require_manager)):
-    return ProductionService(db).list_materials()
+def list_materials(db: Session = Depends(get_db), current_user: User = Depends(require_manager)):
+    return ProductionService(db).list_materials(current_user)
 
 
 @router.post("/batches", response_model=ProductionBatchRead, status_code=201)
@@ -27,5 +27,5 @@ def create_batch(payload: ProductionBatchCreate, db: Session = Depends(get_db), 
 
 
 @router.get("/batches", response_model=list[ProductionBatchRead])
-def list_batches(db: Session = Depends(get_db), _: User = Depends(require_manager)):
-    return ProductionService(db).list_batches()
+def list_batches(db: Session = Depends(get_db), current_user: User = Depends(require_manager)):
+    return ProductionService(db).list_batches(current_user)

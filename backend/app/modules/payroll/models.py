@@ -11,6 +11,7 @@ class PayrollRecord(Base):
     __tablename__ = "payroll_records"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    shop_id: Mapped[int] = mapped_column(ForeignKey("shops.id"), nullable=False, index=True)
     employee_id: Mapped[int] = mapped_column(ForeignKey("employees.id"), nullable=False)
     payroll_month: Mapped[int] = mapped_column(Integer, nullable=False)
     payroll_year: Mapped[int] = mapped_column(Integer, nullable=False)
@@ -21,4 +22,3 @@ class PayrollRecord(Base):
     note: Mapped[str] = mapped_column(String(255), default="", nullable=False)
 
     employee: Mapped[Employee] = relationship()
-

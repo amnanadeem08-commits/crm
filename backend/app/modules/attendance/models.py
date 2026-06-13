@@ -20,6 +20,7 @@ class AttendanceRecord(Base):
     __tablename__ = "attendance_records"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    shop_id: Mapped[int] = mapped_column(ForeignKey("shops.id"), nullable=False, index=True)
     employee_id: Mapped[int] = mapped_column(ForeignKey("employees.id"), nullable=False)
     work_date: Mapped[date] = mapped_column(Date, nullable=False, index=True)
     status: Mapped[AttendanceStatus] = mapped_column(SqlEnum(AttendanceStatus), nullable=False)
@@ -28,4 +29,3 @@ class AttendanceRecord(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
 
     employee: Mapped[Employee] = relationship()
-
