@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:16
+    container_name: smart-crm-db
+    environment:
+      POSTGRES_DB: smart_crm
+      POSTGRES_USER: smart_crm
+      POSTGRES_PASSWORD: smart_crm
+    ports:
+      - "5432:5432"
+    volumes:
+      - smart_crm_pg:/var/lib/postgresql/data
+
+volumes:
+  smart_crm_pg:
+

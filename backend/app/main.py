@@ -1,0 +1,34 @@
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+from app.core.config import settings
+from app.core.database import Base, engine
+from app.modules.auth.routes import router as auth_router
+from app.modules.products.routes import router as products_router
+from app.modules.inventory.routes import router as inventory_router
+from app.modules.ai.routes import router as ai_router
+
+
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(title=settings.app_name)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.cors_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok", "service": settings.app_name}
+
+
+app.include_router(auth_router, prefix="/api/v1/auth", tags=["auth"])
+app.include_router(products_router, prefix="/api/v1/products", tags=["products"])
+app.include_router(inventory_router, prefix="/api/v1/inventory", tags=["inventory"])
+app.include_router(ai_router, prefix="/api/v1/ai", tags=["ai"])
+
