@@ -1,7 +1,13 @@
 from datetime import datetime, timedelta
+from decimal import Decimal
 
 from app.modules.ai.schemas import BusinessException, BusinessHealth, BusinessInsight, DailyBrief
+from app.modules.attendance.models import AttendanceRecord, AttendanceStatus
+from app.modules.finance.schemas import ProfitLossSummary
 from app.modules.inventory.models import InventoryStock, MovementType, StockMovement
+from app.modules.payroll.models import PayrollRecord
+from app.modules.production.models import ProductionBatch
+from app.modules.sales.models import Sale
 
 
 class AiInsightService:
@@ -131,3 +137,137 @@ class AiInsightService:
             important_alerts=important_alerts,
             recommended_actions=actions,
         )
+
+    def full_business_health(
+        self,
+        stock_rows: list[InventoryStock],
+        movements: list[StockMovement],
+        sales: list[Sale],
+        attendance: list[AttendanceRecord],
+        payroll: list[PayrollRecord],
+        profit_loss: ProfitLossSummary,
+        batches: list[ProductionBatch],
+    ) -> BusinessHealth:
+        exceptions = self.detect_exceptions(stock_rows, movements)
+        exceptions.extend(self._module_exceptions(sales, attendance, payroll, profit_loss, batches))
+
+        sales_status = "Not available: no sales records found."
+        if sales:
+            total_revenue = sum(row.total_revenue for row in sales)
+            sales_status = f"{len(sales)} sale(s) recorded with total revenue {total_revenue}."
+
+        profit_status = "Not available: no revenue, payroll, or expense records found."
+        if sales or payroll or profit_loss.expenses:
+            profit_status = f"{profit_loss.status}: net result is {profit_loss.net_profit}."
+
+        production_status = "Not available: no production batches found."
+        if batches:
+            produced = sum(row.quantity_produced for row in batches)
+            wasted = sum(row.wastage_quantity for row in batches)
+            production_status = f"{len(batches)} batch(es), {produced} finished goods, {wasted} wastage units."
+
+        attendance_status = "Not available: no attendance records found."
+        if attendance:
+            issues = [row for row in attendance if row.status in {AttendanceStatus.absent, AttendanceStatus.late}]
+            attendance_status = f"{len(attendance)} attendance record(s), {len(issues)} issue(s)."
+
+        payroll_status = "Not available: no payroll records found."
+        if payroll:
+            total_payroll = sum(row.net_salary for row in payroll)
+            payroll_status = f"{len(payroll)} payroll record(s), total net salary {total_payroll}."
+
+        return BusinessHealth(
+            sales_performance=sales_status,
+            profit_performance=profit_status,
+            inventory_health=self.business_health(stock_rows, movements).inventory_health,
+            production_efficiency=production_status,
+            employee_attendance=attendance_status,
+            payroll_costs=payroll_status,
+            exceptions=exceptions,
+        )
+
+    def full_daily_brief(
+        self,
+        stock_rows: list[InventoryStock],
+        movements: list[StockMovement],
+        sales: list[Sale],
+        attendance: list[AttendanceRecord],
+        profit_loss: ProfitLossSummary,
+        batches: list[ProductionBatch],
+    ) -> DailyBrief:
+        exceptions = self.detect_exceptions(stock_rows, movements)
+        exceptions.extend(self._module_exceptions(sales, attendance, [], profit_loss, batches))
+        revenue = sum(row.total_revenue for row in sales)
+        top_products: dict[str, int] = {}
+        for sale in sales:
+            for item in sale.items:
+                top_products[item.product.name] = top_products.get(item.product.name, 0) + item.quantity
+        top_product = max(top_products, key=top_products.get) if top_products else "Not available"
+        attendance_issues = [row for row in attendance if row.status in {AttendanceStatus.absent, AttendanceStatus.late}]
+        production_issues = [row for row in batches if row.wastage_quantity > 0]
+
+        return DailyBrief(
+            business_summary="Daily brief is based only on available CRM records.",
+            key_metrics=[
+                f"Total Sales: {len(sales)}",
+                f"Total Revenue: {revenue}",
+                f"Profit/Loss Status: {profit_loss.status} ({profit_loss.net_profit})",
+                f"Low Stock Items: {len([row for row in stock_rows if row.current_stock <= row.low_stock_threshold])}",
+                f"Employee Attendance Issues: {len(attendance_issues)}",
+                f"Production Issues: {len(production_issues)}",
+                f"Top Performing Product: {top_product}",
+            ],
+            important_alerts=[exception.issue for exception in exceptions[:5]] or ["No supported operational alerts found in available CRM data."],
+            recommended_actions=[exception.recommended_action for exception in exceptions[:2]] or ["Keep CRM records updated daily."],
+        )
+
+    def _module_exceptions(
+        self,
+        sales: list[Sale],
+        attendance: list[AttendanceRecord],
+        payroll: list[PayrollRecord],
+        profit_loss: ProfitLossSummary,
+        batches: list[ProductionBatch],
+    ) -> list[BusinessException]:
+        exceptions: list[BusinessException] = []
+        if sales and profit_loss.net_profit < 0:
+            exceptions.append(
+                BusinessException(
+                    issue="Profit/Loss risk",
+                    reason=f"Net result is {profit_loss.net_profit}.",
+                    business_impact="The business is spending more than it earns in recorded CRM data.",
+                    recommended_action="Review expenses, payroll records, and product margins.",
+                )
+            )
+        attendance_issues = [row for row in attendance if row.status in {AttendanceStatus.absent, AttendanceStatus.late}]
+        if attendance_issues:
+            exceptions.append(
+                BusinessException(
+                    issue="Attendance issues",
+                    reason=f"{len(attendance_issues)} late or absent attendance record(s) found.",
+                    business_impact="Operations may slow down if staff attendance is inconsistent.",
+                    recommended_action="Speak with affected employees and review shift coverage.",
+                )
+            )
+        payroll_total = sum((row.net_salary for row in payroll), Decimal("0"))
+        revenue_total = sum((row.total_revenue for row in sales), Decimal("0"))
+        if payroll and sales and payroll_total > revenue_total:
+            exceptions.append(
+                BusinessException(
+                    issue="Excess payroll cost",
+                    reason=f"Recorded payroll {payroll_total} is higher than recorded revenue {revenue_total}.",
+                    business_impact="Payroll may be putting pressure on cash flow.",
+                    recommended_action="Review staffing cost against current sales before adding shifts.",
+                )
+            )
+        waste_batches = [row for row in batches if row.wastage_quantity > 0]
+        if waste_batches:
+            exceptions.append(
+                BusinessException(
+                    issue="Production wastage",
+                    reason=f"{len(waste_batches)} batch(es) include wastage.",
+                    business_impact="Wastage can reduce profit and consume raw materials faster.",
+                    recommended_action="Check the production process for batches with wastage.",
+                )
+            )
+        return exceptions

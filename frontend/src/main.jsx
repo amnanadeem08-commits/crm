@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import { Boxes, LayoutDashboard, LogOut, PackagePlus, ShieldCheck, Warehouse } from "lucide-react";
+import { Banknote, Boxes, CalendarCheck, Factory, LayoutDashboard, LogOut, PackagePlus, ReceiptText, ShieldCheck, Users, Warehouse } from "lucide-react";
 
 import "./styles.css";
 import { api, setAuthToken } from "./api/client";
@@ -11,6 +11,12 @@ import { LoginPage } from "./pages/LoginPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { ProductsPage } from "./pages/ProductsPage";
 import { InventoryPage } from "./pages/InventoryPage";
+import { EmployeesPage } from "./pages/EmployeesPage";
+import { AttendancePage } from "./pages/AttendancePage";
+import { SalesPage } from "./pages/SalesPage";
+import { PayrollPage } from "./pages/PayrollPage";
+import { FinancePage } from "./pages/FinancePage";
+import { ProductionPage } from "./pages/ProductionPage";
 
 function Shell({ children }) {
   const { user, logout } = React.useContext(AuthContext);
@@ -28,6 +34,12 @@ function Shell({ children }) {
           <a href="/"><LayoutDashboard size={18} /> Dashboard</a>
           <a href="/products"><PackagePlus size={18} /> Products</a>
           <a href="/inventory"><Warehouse size={18} /> Inventory</a>
+          <a href="/sales"><ReceiptText size={18} /> Sales</a>
+          <a href="/employees"><Users size={18} /> Employees</a>
+          <a href="/attendance"><CalendarCheck size={18} /> Attendance</a>
+          <a href="/payroll"><Banknote size={18} /> Payroll</a>
+          <a href="/finance"><Banknote size={18} /> Profit/Loss</a>
+          <a href="/production"><Factory size={18} /> Production</a>
         </nav>
         <div className="account">
           <div>
@@ -78,6 +90,12 @@ function App() {
           <Route path="/" element={<ProtectedRoute><Shell><DashboardPage /></Shell></ProtectedRoute>} />
           <Route path="/products" element={<ProtectedRoute><Shell><ProductsPage /></Shell></ProtectedRoute>} />
           <Route path="/inventory" element={<ProtectedRoute><Shell><InventoryPage /></Shell></ProtectedRoute>} />
+          <Route path="/sales" element={<ProtectedRoute><Shell><SalesPage /></Shell></ProtectedRoute>} />
+          <Route path="/employees" element={<ProtectedRoute><Shell><EmployeesPage /></Shell></ProtectedRoute>} />
+          <Route path="/attendance" element={<ProtectedRoute><Shell><AttendancePage /></Shell></ProtectedRoute>} />
+          <Route path="/payroll" element={<ProtectedRoute><Shell><PayrollPage /></Shell></ProtectedRoute>} />
+          <Route path="/finance" element={<ProtectedRoute><Shell><FinancePage /></Shell></ProtectedRoute>} />
+          <Route path="/production" element={<ProtectedRoute><Shell><ProductionPage /></Shell></ProtectedRoute>} />
         </Routes>
       </BrowserRouter>
     </AuthContext.Provider>
@@ -85,4 +103,3 @@ function App() {
 }
 
 createRoot(document.getElementById("root")).render(<App />);
-
